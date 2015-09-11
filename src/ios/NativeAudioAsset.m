@@ -13,16 +13,23 @@
 static const CGFloat FADE_STEP = 0.05;
 static const CGFloat FADE_DELAY = 0.08;
 
--(id) initWithPath:(NSString*) path withVoices:(NSNumber*) numVoices withVolume:(NSNumber*) volume withFadeDelay:(NSNumber *)delay
+-(id) initWithPath:(NSURL*) path withVoices:(NSNumber*) numVoices withVolume:(NSNumber*) volume withFadeDelay:(NSNumber *)delay
 {
     self = [super init];
     if(self) {
-        voices = [[NSMutableArray alloc] init];  
+        voices = [[NSMutableArray alloc] init];
         
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSLog(@"INITIATING WITH PATH %@", path);
+        
+        NSError *pathError = nil;
         
         for (int x = 0; x < [numVoices intValue]; x++) {
-            AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:pathURL error: NULL];
+            AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:path error: &pathError];
+            
+            if(pathError != nil) {
+                NSLog(@"INIT WITH PATH ERROR %@", pathError);
+            }
+            
             player.volume = volume.floatValue;
             [player prepareToPlay];
             [voices addObject:player];
@@ -40,15 +47,21 @@ static const CGFloat FADE_DELAY = 0.08;
         }
         
         playIndex = 0;
+    } else {
+        NSLog(@"SELF WAS NULL");
     }
     return(self);
 }
 
 - (void) play
 {
+    NSLog(@"AV AUDIO PLAYER PLAYING");
     AVAudioPlayer * player = [voices objectAtIndex:playIndex];
     [player setCurrentTime:0.0];
-    player.numberOfLoops = 0;
+    [player setVolume:1.0];
+    player.numberOfLoops = 1;
+    player.volume = 1.0;
+    [player prepareToPlay];
     [player play];
     playIndex += 1;
     playIndex = playIndex % [voices count];

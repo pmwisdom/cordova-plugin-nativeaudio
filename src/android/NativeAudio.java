@@ -81,7 +81,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
                     Uri targetUri = resourceApi.remapUri(Uri.parse(assetPath));
                     fileUriStr = targetUri.toString();
                 } catch (IllegalArgumentException e) {
-                    fileUriStr = target;
+                    fileUriStr = assetPath;
                 }
 
                 String fullPath = this.stripFileProtocol(fileUriStr);

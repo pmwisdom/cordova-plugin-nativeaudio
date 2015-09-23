@@ -51,6 +51,7 @@
                 <param name="ios-package" value="NativeAudio"/>
             </feature>
         </config-file>
+        
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
                 <string>audio</string>

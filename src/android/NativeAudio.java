@@ -26,7 +26,10 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.apache.cordova.PluginResult.Status;
+import org.apache.cordova.CordovaResourceApi;
 import org.json.JSONObject;
+
+import android.net.Uri;
 
 
 public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFocusChangeListener {
@@ -51,6 +54,8 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 
 	private PluginResult executePreload(JSONArray data) {
 		String audioID;
+        CordovaResourceApi resourceApi = webView.getResourceApi();
+        
 		try {
 			audioID = data.getString(0);
 			if (!assetMap.containsKey(audioID)) {
@@ -70,8 +75,16 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 				} else {
 					voices = data.getInt(3);
 				}
+                
+                String fileUriStr;
+                try {
+                    Uri targetUri = resourceApi.remapUri(Uri.parse(assetPath));
+                    fileUriStr = targetUri.toString();
+                } catch (IllegalArgumentException e) {
+                    fileUriStr = target;
+                }
 
-				String fullPath = "www/".concat(assetPath);
+				String fullPath = this.stripFileProtocol(fileUriStr)
 
 				Context ctx = cordova.getActivity().getApplicationContext();
 				AssetManager am = ctx.getResources().getAssets();
@@ -313,5 +326,12 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
             NativeAudioAsset asset = resumeList.remove(0);
             asset.resume();
         }
+    }
+    
+    public String stripFileProtocol(String uriString) {
+        if (uriString.startsWith("file://")) {
+            return Uri.parse(uriString).getPath();
+        }
+        return uriString;
     }
 }

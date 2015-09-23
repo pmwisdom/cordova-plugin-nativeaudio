@@ -84,7 +84,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
                     fileUriStr = target;
                 }
 
-				String fullPath = this.stripFileProtocol(fileUriStr)
+                String fullPath = this.stripFileProtocol(fileUriStr);
 
 				Context ctx = cordova.getActivity().getApplicationContext();
 				AssetManager am = ctx.getResources().getAssets();
